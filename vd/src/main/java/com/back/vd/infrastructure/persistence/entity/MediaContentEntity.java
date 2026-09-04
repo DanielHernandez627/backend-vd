@@ -42,5 +42,6 @@ public class MediaContentEntity {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "mediaContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("seasonNumber ASC")
     private List<SeasonEntity> seasons = new ArrayList<>();
 }

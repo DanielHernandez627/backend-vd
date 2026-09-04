@@ -31,6 +31,7 @@ public class SeasonEntity {
     private MediaContentEntity mediaContent;
 
     @OneToMany(mappedBy = "season", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("episodeNumber ASC")
     private List<EpisodeEntity> episodes = new ArrayList<>();
 
     @OneToMany(mappedBy = "defaultSeason", cascade = CascadeType.ALL, orphanRemoval = true)

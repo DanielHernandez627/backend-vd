@@ -11,6 +11,7 @@ import com.back.vd.infrastructure.persistence.entity.SkipTimestampEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,10 @@ public class MediaContentEntityMapper {
         if (entity == null) return null;
 
         List<Season> seasons = entity.getSeasons() != null ?
-                entity.getSeasons().stream().map(this::seasonToDomain).collect(Collectors.toList()) : new ArrayList<>();
+                entity.getSeasons().stream()
+                        .map(this::seasonToDomain)
+                        .sorted(Comparator.comparing(Season::getSeasonNumber, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .collect(Collectors.toList()) : new ArrayList<>();
 
         return new MediaContent(
                 entity.getId(),
@@ -61,7 +65,10 @@ public class MediaContentEntityMapper {
         if (entity == null) return null;
 
         List<Episode> episodes = entity.getEpisodes() != null ?
-                entity.getEpisodes().stream().map(this::episodeToDomain).collect(Collectors.toList()) : new ArrayList<>();
+                entity.getEpisodes().stream()
+                        .map(this::episodeToDomain)
+                        .sorted(Comparator.comparing(Episode::getEpisodeNumber, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .collect(Collectors.toList()) : new ArrayList<>();
 
         List<SkipTimestamp> defaultSkipTimestamps = entity.getDefaultSkipTimestamps() != null ?
                 entity.getDefaultSkipTimestamps().stream().map(this::skipTimestampToDomain).collect(Collectors.toList()) : new ArrayList<>();
