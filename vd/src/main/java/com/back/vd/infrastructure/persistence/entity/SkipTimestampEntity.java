@@ -32,6 +32,10 @@ public class SkipTimestampEntity {
     private String label;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "episode_id", nullable = false)
+    @JoinColumn(name = "episode_id", nullable = true)
     private EpisodeEntity episode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "default_season_id", nullable = true)
+    private SeasonEntity defaultSeason;
 }

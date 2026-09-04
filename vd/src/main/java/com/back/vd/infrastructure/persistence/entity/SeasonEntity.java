@@ -32,4 +32,7 @@ public class SeasonEntity {
 
     @OneToMany(mappedBy = "season", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EpisodeEntity> episodes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "defaultSeason", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SkipTimestampEntity> defaultSkipTimestamps = new ArrayList<>();
 }

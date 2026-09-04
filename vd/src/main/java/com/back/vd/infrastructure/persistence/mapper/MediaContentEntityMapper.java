@@ -63,11 +63,15 @@ public class MediaContentEntityMapper {
         List<Episode> episodes = entity.getEpisodes() != null ?
                 entity.getEpisodes().stream().map(this::episodeToDomain).collect(Collectors.toList()) : new ArrayList<>();
 
+        List<SkipTimestamp> defaultSkipTimestamps = entity.getDefaultSkipTimestamps() != null ?
+                entity.getDefaultSkipTimestamps().stream().map(this::skipTimestampToDomain).collect(Collectors.toList()) : new ArrayList<>();
+
         return new Season(
                 entity.getId(),
                 entity.getSeasonNumber(),
                 entity.getTitle(),
-                episodes
+                episodes,
+                defaultSkipTimestamps
         );
     }
 
@@ -86,6 +90,17 @@ public class MediaContentEntityMapper {
                 return ee;
             }).collect(Collectors.toList());
             entity.setEpisodes(episodeEntities);
+        }
+
+        if (domain.getDefaultSkipTimestamps() != null) {
+            List<SkipTimestampEntity> defaultSkipEntities = domain.getDefaultSkipTimestamps().stream()
+                    .map(sk -> {
+                        SkipTimestampEntity ske = skipTimestampToEntity(sk);
+                        ske.setDefaultSeason(entity);
+                        return ske;
+                    })
+                    .collect(Collectors.toList());
+            entity.setDefaultSkipTimestamps(defaultSkipEntities);
         }
 
         return entity;
