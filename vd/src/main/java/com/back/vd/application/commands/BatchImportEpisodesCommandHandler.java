@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,23 +103,37 @@ public class BatchImportEpisodesCommandHandler {
 
         int nextEpisodeNumber = targetSeason.getEpisodes().size() + 1;
         List<String> importedFileNames = new ArrayList<>();
+        List<String> skippedFileNames = new ArrayList<>();
 
         for (File file : videoFiles) {
             int episodeNum = extractEpisodeNumber(file.getName(), nextEpisodeNumber);
-            String title = formatEpisodeTitle(file.getName(), episodeNum);
 
-            Episode episode = new Episode(
-                    null,
-                    episodeNum,
-                    title,
-                    file.getAbsolutePath(),
-                    0,
-                    new ArrayList<>()
-            );
+            Optional<Episode> existingEpisode = targetSeason.getEpisodes().stream()
+                    .filter(e -> (e.getEpisodeNumber() != null && e.getEpisodeNumber().equals(episodeNum))
+                              || (e.getVideoPath() != null && e.getVideoPath().equalsIgnoreCase(file.getAbsolutePath())))
+                    .findFirst();
 
-            targetSeason.addEpisode(episode);
-            importedFileNames.add(file.getName());
-            nextEpisodeNumber++;
+            if (existingEpisode.isPresent()) {
+                Episode ep = existingEpisode.get();
+                if (!file.getAbsolutePath().equalsIgnoreCase(ep.getVideoPath())) {
+                    ep.setVideoPath(file.getAbsolutePath());
+                }
+                skippedFileNames.add(file.getName());
+            } else {
+                String title = formatEpisodeTitle(file.getName(), episodeNum);
+                Episode newEpisode = new Episode(
+                        null,
+                        episodeNum,
+                        title,
+                        file.getAbsolutePath(),
+                        0,
+                        new ArrayList<>()
+                );
+
+                targetSeason.addEpisode(newEpisode);
+                importedFileNames.add(file.getName());
+                nextEpisodeNumber++;
+            }
         }
 
         MediaContent savedMediaContent = repositoryPort.save(targetMediaContent);
@@ -128,9 +143,11 @@ public class BatchImportEpisodesCommandHandler {
                 .orElse(targetSeason);
 
         return new BatchImportResponseDto(
-                videoFiles.length,
+                importedFileNames.size(),
+                skippedFileNames.size(),
                 savedSeason.getId(),
-                importedFileNames
+                importedFileNames,
+                skippedFileNames
         );
     }
 
