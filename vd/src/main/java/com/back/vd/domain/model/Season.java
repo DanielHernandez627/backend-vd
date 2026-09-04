@@ -8,15 +8,21 @@ public class Season {
     private Integer seasonNumber;
     private String title;
     private List<Episode> episodes = new ArrayList<>();
+    private List<SkipTimestamp> defaultSkipTimestamps = new ArrayList<>();
 
     public Season() {
     }
 
     public Season(Long id, Integer seasonNumber, String title, List<Episode> episodes) {
+        this(id, seasonNumber, title, episodes, new ArrayList<>());
+    }
+
+    public Season(Long id, Integer seasonNumber, String title, List<Episode> episodes, List<SkipTimestamp> defaultSkipTimestamps) {
         this.id = id;
         this.seasonNumber = seasonNumber;
         this.title = title;
         this.episodes = episodes != null ? episodes : new ArrayList<>();
+        this.defaultSkipTimestamps = defaultSkipTimestamps != null ? defaultSkipTimestamps : new ArrayList<>();
     }
 
     public Long getId() {
@@ -51,7 +57,19 @@ public class Season {
         this.episodes = episodes;
     }
 
+    public List<SkipTimestamp> getDefaultSkipTimestamps() {
+        return defaultSkipTimestamps;
+    }
+
+    public void setDefaultSkipTimestamps(List<SkipTimestamp> defaultSkipTimestamps) {
+        this.defaultSkipTimestamps = defaultSkipTimestamps;
+    }
+
     public void addEpisode(Episode episode) {
         this.episodes.add(episode);
+    }
+
+    public void addDefaultSkipTimestamp(SkipTimestamp skipTimestamp) {
+        this.defaultSkipTimestamps.add(skipTimestamp);
     }
 }
